@@ -17,17 +17,22 @@
             "homepage": "http://www.chadsikorra.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/barthuttinga/ldaptools"
+        }
+    ],
     "require": {
-        "ldaptools/ldaptools": ">=0.25",
-        "symfony/framework-bundle": "~2.7|~3.0|~4.0"
+        "ldaptools/ldaptools": "dev-master",
+        "symfony/framework-bundle": "~5.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "~1.0",
-        "phpspec/phpspec": "~3.0",
-        "akeneo/phpspec-skip-example-extension": "~2.0",
-        "doctrine/orm": "~2.4",
-        "symfony/form": "~2.7|~3.0|~4.0",
-        "symfony/security-bundle": "~2.7|~3.0|~4.0"
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpspec/phpspec": "^6.1",
+        "doctrine/orm": "^2.7",
+        "symfony/form": "~5.0",
+        "symfony/security-bundle": "~5.0"
     },
     "suggest": {
         "doctrine/doctrine-bundle": "For LDAP object type integration in Doctrine."

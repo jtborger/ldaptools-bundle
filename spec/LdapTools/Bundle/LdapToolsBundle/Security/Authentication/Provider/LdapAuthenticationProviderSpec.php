@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Prophecy\Promise\ReturnArgumentPromise;
 
 class LdapAuthenticationProviderSpec extends ObjectBehavior
 {
@@ -57,13 +58,18 @@ class LdapAuthenticationProviderSpec extends ObjectBehavior
         $ldap->getDomainContext()->willReturn('foo.bar');
 
         $user->getUsername()->willReturn('foo');
-        $user->getRoles()->willReturn(['ROLE_USER']);
+        $user->getRoleNames()->willReturn(['ROLE_USER']);
         $user->isAccountNonLocked()->willReturn(true);
         $user->isEnabled()->willReturn(true);
         $user->isAccountNonExpired()->willReturn(true);
         $user->isCredentialsNonExpired()->willReturn(true);
         $user->has('dn')->willReturn(true);
         $user->get('dn')->willReturn('cn=foo,dc=foo,dc=bar');
+
+        $dispatcher->dispatch(
+            Argument::type(\Symfony\Contracts\EventDispatcher\Event::class),
+            Argument::type('string')
+        )->willReturn(new ReturnArgumentPromise(0));
 
         $this->beConstructedWith(
             'restricted',
@@ -94,7 +100,7 @@ class LdapAuthenticationProviderSpec extends ObjectBehavior
 
     function it_should_add_data_to_the_new_token_correctly($token, $user)
     {
-        $this->authenticate($token)->getRoles()->shouldHaveCount(1);
+        $this->authenticate($token)->getRoleNames()->shouldHaveCount(1);
         $this->authenticate($token)->getUser()->shouldBeEqualTo($user);
         $this->authenticate($token)->getAttributes()->shouldBeEqualTo([]);
         $this->authenticate($token)->getProviderKey()->shouldBeEqualTo('restricted');
@@ -208,10 +214,10 @@ class LdapAuthenticationProviderSpec extends ObjectBehavior
 
         $this->authenticate($token)->shouldReturnAnInstanceOf('\Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken');
     }
-    
+
     function it_should_call_a_login_success_event($token, $dispatcher)
     {
-        $dispatcher->dispatch('ldap_tools_bundle.login.success', Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\LdapLoginEvent'))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\LdapLoginEvent'), 'ldap_tools_bundle.login.success')->shouldBeCalled();
         $this->authenticate($token);
     }
 

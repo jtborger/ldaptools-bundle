@@ -88,11 +88,11 @@ class LdapUserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        $this->dispatcher->dispatch(LoadUserEvent::BEFORE, new LoadUserEvent($username, $this->ldap->getDomainContext()));
+        $this->dispatcher->dispatch(new LoadUserEvent($username, $this->ldap->getDomainContext()), LoadUserEvent::BEFORE);
         $ldapUser = $this->getLdapUser('username', $username);
         $user = $this->constructUserClass($ldapUser);
         $this->roleMapper->setRoles($user);
-        $this->dispatcher->dispatch(LoadUserEvent::AFTER, new LoadUserEvent($username, $this->ldap->getDomainContext(), $user, $ldapUser));
+        $this->dispatcher->dispatch(new LoadUserEvent($username, $this->ldap->getDomainContext(), $user, $ldapUser), LoadUserEvent::AFTER);
 
         return $user;
     }
@@ -105,7 +105,7 @@ class LdapUserProvider implements UserProviderInterface
         if (!$user instanceof LdapUserInterface) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
-        $roles = $user->getRoles();
+        $roles = $user->getRoleNames();
 
         if ($this->options['refresh_user_attributes']) {
             $user = $this->constructUserClass($this->getLdapUser('guid', $user->getLdapGuid()));

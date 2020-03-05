@@ -26,6 +26,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\User\User;
+use Prophecy\Promise\ReturnArgumentPromise;
 
 class LdapUserProviderSpec extends ObjectBehavior
 {
@@ -62,6 +63,11 @@ class LdapUserProviderSpec extends ObjectBehavior
         $connection->getConfig()->willReturn($config);
         $ldap->getConnection()->willReturn($connection);
 
+        $dispatcher->dispatch(
+            Argument::type(\Symfony\Contracts\EventDispatcher\Event::class),
+            Argument::type('string')
+        )->willReturn(new ReturnArgumentPromise(0));
+
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, []);
     }
 
@@ -72,8 +78,8 @@ class LdapUserProviderSpec extends ObjectBehavior
 
     function it_should_load_by_username($dispatcher)
     {
-        $dispatcher->dispatch(LoadUserEvent::BEFORE, Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'))->shouldBeCalledTimes(1);
-        $dispatcher->dispatch(LoadUserEvent::AFTER, Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'))->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'), LoadUserEvent::BEFORE)->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'), LoadUserEvent::AFTER)->shouldBeCalledTimes(1);
 
         $this->loadUserByUsername('foo')->shouldBeAnInstanceOf('\LdapTools\Bundle\LdapToolsBundle\Security\User\LdapUser');
     }
@@ -99,7 +105,7 @@ class LdapUserProviderSpec extends ObjectBehavior
     {
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, ['refresh_user_attributes' => true]);
 
-        $user->getRoles()->willReturn(['ROLE_USER']);
+        $user->getRoleNames()->willReturn(['ROLE_USER']);
         $user->setRoles(['ROLE_USER'])->willReturn($user);
         $user->getLdapGuid()->shouldBeCalled()->willReturn($this->attr['guid']);
         $qb->where(['guid' => $this->attr['guid']])->shouldBeCalled()->willReturn($qb);
@@ -157,7 +163,7 @@ class LdapUserProviderSpec extends ObjectBehavior
     {
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, ['refresh_user_roles' => false, 'refresh_user_attributes' => false]);
 
-        $user->getRoles()->willReturn([]);
+        $user->getRoleNames()->willReturn([]);
         $user->setRoles([])->shouldBeCalled();
         $connection->execute(Argument::any())->shouldNotBeCalled();
         $roleMapper->setRoles(Argument::any())->shouldNotBeCalled();
@@ -174,17 +180,17 @@ class LdapUserProviderSpec extends ObjectBehavior
 
         $user->getLdapGuid()->shouldBeCalled()->willReturn($this->attr['guid']);
         $qb->where(['guid' => $this->attr['guid']])->shouldBeCalled()->willReturn($qb);
-        $user->getRoles()->willReturn(['ROLE_USER']);
+        $user->getRoleNames()->willReturn(['ROLE_USER']);
 
         $this->refreshUser($user)->toArray()->shouldBeEqualTo($this->attr);
-        $this->refreshUser($user)->getRoles()->shouldBeEqualTo(['ROLE_USER']);
+        $this->refreshUser($user)->getRoleNames()->shouldBeEqualTo(['ROLE_USER']);
     }
 
     function it_should_refresh_roles_but_not_attributes_if_specified($query, LdapUser $user, $roleMapper, $ldap, $dispatcher)
     {
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, ['refresh_user_roles' => true, 'refresh_user_attributes' => false]);
 
-        $user->getRoles()->willReturn(['ROLE_USER']);
+        $user->getRoleNames()->willReturn(['ROLE_USER']);
         $query->getSingleResult()->shouldNotBeCalled();
         $roleMapper->setRoles($user)->shouldBeCalled();
 

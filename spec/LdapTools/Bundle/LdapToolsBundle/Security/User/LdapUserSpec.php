@@ -41,7 +41,7 @@ class LdapUserSpec extends ObjectBehavior
 
     function it_should_implement_AdvancedUserInterface()
     {
-        $this->shouldImplement('\Symfony\Component\Security\Core\User\AdvancedUserInterface');
+        $this->shouldImplement('\Symfony\Component\Security\Core\User\UserInterface');
     }
 
     function it_should_implement_Serializable()
@@ -102,22 +102,22 @@ class LdapUserSpec extends ObjectBehavior
 
     function it_should_have_no_roles_by_default()
     {
-        $this->getRoles()->shouldHaveCount(0);
+        $this->getRoleNames()->shouldHaveCount(0);
     }
 
     function it_should_add_roles_properly()
     {
         $this->addRole('foo');
-        $this->getRoles()->shouldBeEqualTo(['FOO']);
+        $this->getRoleNames()->shouldBeEqualTo(['FOO']);
         $this->addRole('BAR');
-        $this->getRoles()->shouldBeEqualTo(['FOO', 'BAR']);
+        $this->getRoleNames()->shouldBeEqualTo(['FOO', 'BAR']);
     }
 
     function it_should_set_roles_properly()
     {
         $this->addRole('meh');
         $this->setRoles(['foo','BAR']);
-        $this->getRoles()->shouldBeEqualTo(['FOO', 'BAR']);
+        $this->getRoleNames()->shouldBeEqualTo(['FOO', 'BAR']);
     }
 
     function it_should_have_a_string_representation_of_a_dn_by_default()
