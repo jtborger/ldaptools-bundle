@@ -59,7 +59,8 @@ class LdapObjectType extends AbstractType
                     return null;
                 }
 
-                return new LdapObjectChoiceLoader($ldap,
+                return new LdapObjectChoiceLoader(
+                    $ldap,
                     $options['ldap_type'],
                     $options['choice_name'],
                     $options['choice_value'],

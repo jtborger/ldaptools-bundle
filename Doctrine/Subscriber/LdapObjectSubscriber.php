@@ -233,7 +233,7 @@ class LdapObjectSubscriber implements EventSubscriber
             foreach ($values as $value) {
                 $query->orWhere([$annotation->id => $value]);
             }
-        // A currently null/empty value?
+            // A currently null/empty value?
         } else {
             return null;
         }

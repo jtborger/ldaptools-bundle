@@ -187,7 +187,7 @@ class LdapUserProvider implements UserProviderInterface
             $user->setLdapGuid($ldapObject->get('guid'));
         } catch (\Throwable $e) {
             throw new UnsupportedUserException(sprintf($errorMessage, $this->options['user'], $e->getMessage()));
-        // Unlikely to help much in PHP 5.6, but oh well...
+            // Unlikely to help much in PHP 5.6, but oh well...
         } catch (\Exception $e) {
             throw new UnsupportedUserException(sprintf($errorMessage, $this->options['user'], $e->getMessage()));
         }
