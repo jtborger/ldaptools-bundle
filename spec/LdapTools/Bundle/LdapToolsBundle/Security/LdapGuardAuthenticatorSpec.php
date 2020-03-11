@@ -301,7 +301,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
     function it_should_create_an_authentication_token_with_the_domain_name(UserInterface $user, $connection)
     {
         $user->getUsername()->shouldBeCalled()->willReturn('foo');
-        $user->getRoleNames()->shouldBeCalled()->willReturn(['USER']);
+        $user->getRoles()->shouldBeCalled()->willReturn(['USER']);
         $connection->execute(new AuthenticationOperation('foo', 'bar'))->shouldBeCalled()->willReturn(new AuthenticationResponse(true));
 
         $this->checkCredentials(['username' => 'foo', 'password' => 'bar', 'domain' => ''], $user);
@@ -339,7 +339,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $credentials = $this->credentials;
         $credentials['ldap_domain'] = '';
         $user = (new LdapUser())->refresh(['guid' => 'foo', 'username' => 'foo']);
-        $token = new UsernamePasswordToken($user, $credentials['password'], 'ldap-tools', $user->getRoleNames());
+        $token = new UsernamePasswordToken($user, $credentials['password'], 'ldap-tools', $user->getRoles());
         $token->setAttribute('ldap_domain', '');
 
         $connection->execute(new AuthenticationOperation('foo', 'bar'))->shouldBeCalled()->willReturn(new AuthenticationResponse(true));

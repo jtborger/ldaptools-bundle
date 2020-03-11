@@ -105,7 +105,7 @@ class LdapUserProvider implements UserProviderInterface
         if (!$user instanceof LdapUserInterface) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
-        $roles = $user->getRoleNames();
+        $roles = $user->getRoles();
 
         if ($this->options['refresh_user_attributes']) {
             $user = $this->constructUserClass($this->getLdapUser('guid', $user->getLdapGuid()));

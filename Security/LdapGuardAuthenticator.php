@@ -210,7 +210,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
                 );
             }
             // No way to get the token from the Guard, need to create one to pass...
-            $token = new UsernamePasswordToken($user, $credentials['password'], 'ldap-tools', $user->getRoleNames());
+            $token = new UsernamePasswordToken($user, $credentials['password'], 'ldap-tools', $user->getRoles());
             $token->setAttribute('ldap_domain', $credDomain);
             $this->dispatcher->dispatch(
                 new LdapLoginEvent($user, $token),

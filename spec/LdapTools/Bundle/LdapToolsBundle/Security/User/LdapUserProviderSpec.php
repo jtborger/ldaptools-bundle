@@ -105,7 +105,7 @@ class LdapUserProviderSpec extends ObjectBehavior
     {
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, ['refresh_user_attributes' => true]);
 
-        $user->getRoleNames()->willReturn(['ROLE_USER']);
+        $user->getRoles()->willReturn(['ROLE_USER']);
         $user->setRoles(['ROLE_USER'])->willReturn($user);
         $user->getLdapGuid()->shouldBeCalled()->willReturn($this->attr['guid']);
         $qb->where(['guid' => $this->attr['guid']])->shouldBeCalled()->willReturn($qb);
@@ -163,7 +163,7 @@ class LdapUserProviderSpec extends ObjectBehavior
     {
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, ['refresh_user_roles' => false, 'refresh_user_attributes' => false]);
 
-        $user->getRoleNames()->willReturn([]);
+        $user->getRoles()->willReturn([]);
         $user->setRoles([])->shouldBeCalled();
         $connection->execute(Argument::any())->shouldNotBeCalled();
         $roleMapper->setRoles(Argument::any())->shouldNotBeCalled();
@@ -180,17 +180,17 @@ class LdapUserProviderSpec extends ObjectBehavior
 
         $user->getLdapGuid()->shouldBeCalled()->willReturn($this->attr['guid']);
         $qb->where(['guid' => $this->attr['guid']])->shouldBeCalled()->willReturn($qb);
-        $user->getRoleNames()->willReturn(['ROLE_USER']);
+        $user->getRoles()->willReturn(['ROLE_USER']);
 
         $this->refreshUser($user)->toArray()->shouldBeEqualTo($this->attr);
-        $this->refreshUser($user)->getRoleNames()->shouldBeEqualTo(['ROLE_USER']);
+        $this->refreshUser($user)->getRoles()->shouldBeEqualTo(['ROLE_USER']);
     }
 
     function it_should_refresh_roles_but_not_attributes_if_specified($query, LdapUser $user, $roleMapper, $ldap, $dispatcher)
     {
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, ['refresh_user_roles' => true, 'refresh_user_attributes' => false]);
 
-        $user->getRoleNames()->willReturn(['ROLE_USER']);
+        $user->getRoles()->willReturn(['ROLE_USER']);
         $query->getSingleResult()->shouldNotBeCalled();
         $roleMapper->setRoles($user)->shouldBeCalled();
 

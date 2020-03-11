@@ -57,7 +57,7 @@ class LdapUser extends LdapObject implements LdapUserInterface, UserInterface, \
     /**
      * {@inheritdoc}
      */
-    public function getRoleNames()
+    public function getRoles()
     {
         return $this->roles;
     }

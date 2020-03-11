@@ -58,7 +58,7 @@ class LdapAuthenticationProviderSpec extends ObjectBehavior
         $ldap->getDomainContext()->willReturn('foo.bar');
 
         $user->getUsername()->willReturn('foo');
-        $user->getRoleNames()->willReturn(['ROLE_USER']);
+        $user->getRoles()->willReturn(['ROLE_USER']);
         $user->isAccountNonLocked()->willReturn(true);
         $user->isEnabled()->willReturn(true);
         $user->isAccountNonExpired()->willReturn(true);

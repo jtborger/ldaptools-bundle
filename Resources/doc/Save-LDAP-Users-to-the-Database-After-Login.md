@@ -132,7 +132,7 @@ class AppUser implements LdapUserInterface, UserInterface
     /**
      * @return array
      */
-    public function getRoleNames()
+    public function getRoles()
     {
         return $this->roles;
     }

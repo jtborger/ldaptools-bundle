@@ -77,13 +77,13 @@ class LdapRoleMapperSpec extends ObjectBehavior
 
     function it_should_set_the_roles_properly_for_the_returned_groups($query)
     {
-        $this->setRoles($this->user)->getRoleNames()->shouldBeEqualTo(['ROLE_USER', 'ROLE_AWESOME', 'ROLE_ADMIN', 'ROLE_DN', 'ROLE_SID']);
+        $this->setRoles($this->user)->getRoles()->shouldBeEqualTo(['ROLE_USER', 'ROLE_AWESOME', 'ROLE_ADMIN', 'ROLE_DN', 'ROLE_SID']);
 
         $query->getResult()->willReturn(new LdapObjectCollection(new LdapObject(['name' => 'foo'])));
-        $this->setRoles($this->user)->getRoleNames()->shouldBeEqualTo(['ROLE_USER', 'ROLE_AWESOME']);
+        $this->setRoles($this->user)->getRoles()->shouldBeEqualTo(['ROLE_USER', 'ROLE_AWESOME']);
 
         $query->getResult()->willReturn(new LdapObjectCollection(new LdapObject(['name' => 'foo.bar'])));
-        $this->setRoles($this->user)->getRoleNames()->shouldBeEqualTo(['ROLE_USER']);
+        $this->setRoles($this->user)->getRoles()->shouldBeEqualTo(['ROLE_USER']);
     }
 
     function it_should_not_search_recursively_when_the_LDAP_type_is_openldap($qb, $connection)
@@ -132,14 +132,14 @@ class LdapRoleMapperSpec extends ObjectBehavior
 
         $query->getResult()->willReturn(new LdapObjectCollection(new LdapObject(['name' => 'Test'])));
 
-        $this->setRoles($this->user)->getRoleNames()->shouldBeEqualTo([]);
+        $this->setRoles($this->user)->getRoles()->shouldBeEqualTo([]);
     }
 
     function it_should_set_the_default_role($ldap)
     {
         $this->beConstructedWith($ldap, array_merge($this->options, ['default_role' => 'foobar']));
 
-        $this->setRoles($this->user)->getRoleNames()->shouldContain('FOOBAR');
+        $this->setRoles($this->user)->getRoles()->shouldContain('FOOBAR');
     }
 
     function it_should_not_query_ldap_if_no_roles_are_defined($ldap, $query)

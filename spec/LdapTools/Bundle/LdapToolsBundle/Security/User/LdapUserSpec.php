@@ -102,22 +102,22 @@ class LdapUserSpec extends ObjectBehavior
 
     function it_should_have_no_roles_by_default()
     {
-        $this->getRoleNames()->shouldHaveCount(0);
+        $this->getRoles()->shouldHaveCount(0);
     }
 
     function it_should_add_roles_properly()
     {
         $this->addRole('foo');
-        $this->getRoleNames()->shouldBeEqualTo(['FOO']);
+        $this->getRoles()->shouldBeEqualTo(['FOO']);
         $this->addRole('BAR');
-        $this->getRoleNames()->shouldBeEqualTo(['FOO', 'BAR']);
+        $this->getRoles()->shouldBeEqualTo(['FOO', 'BAR']);
     }
 
     function it_should_set_roles_properly()
     {
         $this->addRole('meh');
         $this->setRoles(['foo','BAR']);
-        $this->getRoleNames()->shouldBeEqualTo(['FOO', 'BAR']);
+        $this->getRoles()->shouldBeEqualTo(['FOO', 'BAR']);
     }
 
     function it_should_have_a_string_representation_of_a_dn_by_default()

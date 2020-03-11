@@ -158,7 +158,7 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
         }
         $this->dispatcher->dispatch(new LdapLoginEvent($user, $token), LdapLoginEvent::SUCCESS);
 
-        $newToken = new UsernamePasswordToken($user, null, $this->providerKey, $user->getRoleNames());
+        $newToken = new UsernamePasswordToken($user, null, $this->providerKey, $user->getRoles());
         $newToken->setAttributes($token->getAttributes());
 
         return $newToken;
