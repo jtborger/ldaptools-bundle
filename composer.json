@@ -8,7 +8,7 @@
         "OpenLDAP",
         "Microsoft Exchange"
     ],
-    "homepage": "http://github.com/ldaptools/LdapToolsBundle",
+    "homepage": "http://github.com/jtborger/LdapToolsBundle",
     "license": "MIT",
     "authors": [
         {
