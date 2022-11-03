@@ -8,7 +8,7 @@
         "OpenLDAP",
         "Microsoft Exchange"
     ],
-    "homepage": "http://github.com/jtborger/LdapToolsBundle",
+    "homepage": "https://github.com/jtborger/LdapToolsBundle",
     "license": "MIT",
     "authors": [
         {
@@ -20,19 +20,19 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/barthuttinga/ldaptools"
+            "url": "https://github.com/jtborger/ldaptools"
         }
     ],
     "require": {
         "ldaptools/ldaptools": "dev-master",
-        "symfony/framework-bundle": "~5.0"
+        "symfony/framework-bundle": "~4.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
         "phpspec/phpspec": "^6.1",
         "doctrine/orm": "^2.7",
-        "symfony/form": "~5.0",
-        "symfony/security-bundle": "~5.0"
+        "symfony/form": "~4.4",
+        "symfony/security-bundle": "~4.4"
     },
     "suggest": {
         "doctrine/doctrine-bundle": "For LDAP object type integration in Doctrine."
