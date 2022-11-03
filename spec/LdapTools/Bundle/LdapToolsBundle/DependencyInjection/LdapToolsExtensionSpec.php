@@ -108,6 +108,8 @@ class LdapToolsExtensionSpec extends ObjectBehavior
 
         $container->getDefinition("ldap_tools.cache_warmer.ldap_tools_cache_warmer")->willReturn($cacheWarmer);
         $container->getDefinition("ldap_tools.doctrine.event_listener.ldap_object")->willReturn($doctrineEvents);
+
+        $container->removeBindings(Argument::type('string'))->willReturn(null);
     }
 
     function it_is_initializable()

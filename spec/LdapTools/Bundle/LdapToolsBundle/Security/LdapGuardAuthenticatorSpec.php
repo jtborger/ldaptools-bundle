@@ -42,10 +42,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Prophecy\Promise\ReturnArgumentPromise;
 
-/**
- * @require Symfony\Component\Security\Guard\AbstractGuardAuthenticator
- */
 class LdapGuardAuthenticatorSpec extends ObjectBehavior
 {
     /**
@@ -80,7 +78,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         'password' => 'bar',
         'ldap_domain' => 'foo.bar',
     ];
-    
+
     function let(LdapManager $ldap, LdapConnectionInterface $connection, AuthenticationEntryPointInterface $entryPoint, EventDispatcherInterface $dispatcher, DefaultAuthenticationSuccessHandler $authSuccess, DefaultAuthenticationFailureHandler $authFailure, LdapUserProvider $ldapUserProvider)
     {
         $this->userChecker = new LdapUserChecker();
@@ -95,6 +93,11 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $authFailure->onAuthenticationFailure(Argument::any(), Argument::any())->willReturn(RedirectResponse::create('/'));
         $authSuccess->onAuthenticationSuccess(Argument::any(), Argument::any())->willReturn(RedirectResponse::create('/'));
 
+        $dispatcher->dispatch(
+            Argument::type(\Symfony\Contracts\EventDispatcher\Event::class),
+            Argument::type('string')
+        )->willReturn(new ReturnArgumentPromise(0));
+
         $this->beConstructedWith(true, $this->userChecker, $ldap, $entryPoint, $dispatcher, $authSuccess, $authFailure, ['hide_user_not_found_exceptions' => true], $ldapUserProvider);
     }
 
@@ -102,11 +105,11 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
     {
         $this->shouldHaveType('LdapTools\Bundle\LdapToolsBundle\Security\LdapGuardAuthenticator');
     }
-    
+
     function it_should_get_the_credentials_array()
     {
         $this->request->request->add($this->requestCreds);
-        
+
         $this->getCredentials($this->request)->shouldBeEqualTo(['username' => 'foo', 'password' => 'bar', 'ldap_domain' => 'foo.bar']);
     }
 
@@ -156,7 +159,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
     {
         $credentials = $this->credentials;
         $credentials['ldap_domain'] = '';
-        
+
         $up->loadUserByUsername('foo')->shouldBeCalled()->willThrow(new UsernameNotFoundException('foo'));
         $this->shouldThrow('Symfony\Component\Security\Core\Exception\BadCredentialsException')->duringGetUser($this->credentials, $up);
 
@@ -176,7 +179,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $e = new CustomUserMessageAuthenticationException('unavailable');
         $up->loadUserByUsername('foo')->shouldBeCalled()->willThrow(new LdapConnectionException('unavailable'));
         $this->shouldThrow($e)->duringGetUser($this->credentials, $up);
-        
+
         $e = new UsernameNotFoundException('foo');
         $up->loadUserByUsername('foo')->shouldBeCalled()->willThrow($e);
         $this->shouldThrow($e)->duringGetUser($this->credentials, $up);
@@ -191,7 +194,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $credentials = $this->credentials;
         $credentials['ldap_domain'] = '';
         $this->beConstructedWith(false, $this->userChecker, $ldap, $entryPoint, $dispatcher, $authSuccess, $authFailure, [], $ldapUserProvider);
-        
+
         $user = (new LdapUser())->refresh([
             'username' => 'foo',
             'enabled' => false,
@@ -241,14 +244,14 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $connection->execute(new AuthenticationOperation('foo', 'bar'))->shouldBeCalled()->willReturn(new AuthenticationResponse(false, 'foo', ResponseCode::AccountDisabled));
         $this->shouldThrow('Symfony\Component\Security\Core\Exception\BadCredentialsException')->duringCheckCredentials($credentials, $user);
     }
-    
+
     function it_should_not_mask_the_error_message_when_checking_credentials_if_specified($ldap, $entryPoint, $dispatcher, $connection, $authSuccess, $authFailure, $ldapUserProvider)
     {
         $credentials = $this->credentials;
         $credentials['ldap_domain'] = '';
         $this->beConstructedWith(false, $this->userChecker, $ldap, $entryPoint, $dispatcher, $authSuccess, $authFailure,  [], $ldapUserProvider);
         $user = (new LdapUser())->refresh(['guid' => 'foo', 'username' => 'foo']);
-        
+
         $connection->execute(new AuthenticationOperation('foo', 'bar'))->shouldBeCalled()->willReturn(
             new AuthenticationResponse(false, ResponseCode::getMessageForError(ResponseCode::AccountPasswordMustChange), ResponseCode::AccountPasswordMustChange)
         );
@@ -258,7 +261,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
             new AuthenticationResponse(false, ResponseCode::getMessageForError(ResponseCode::AccountDisabled), ResponseCode::AccountDisabled)
         );
         $this->shouldThrow('Symfony\Component\Security\Core\Exception\DisabledException')->duringCheckCredentials($this->credentials, $user);
-        
+
         $connection->execute(new AuthenticationOperation('foo', 'bar'))->shouldBeCalled()->willThrow(new LdapConnectionException('unavailable'));
         $this->shouldThrow(new CustomUserMessageAuthenticationException('unavailable'))->duringCheckCredentials($this->credentials, $user);
     }
@@ -284,7 +287,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $this->shouldThrow('Symfony\Component\Security\Core\Exception\BadCredentialsException')->duringCheckCredentials($credentials, $user);
         $this->shouldThrow('Symfony\Component\Security\Core\Exception\BadCredentialsException')->duringGetUser($credentials, $up);
     }
-    
+
     function it_should_return_a_redirect_response_after_authentication_success(TokenInterface $token)
     {
         $this->onAuthenticationSuccess($this->request, $token, 'main')->shouldReturnAnInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse');
@@ -308,7 +311,7 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
 
     function it_should_return_a_redirect_response_on_start()
     {
-        $this->start($this->request, null)->shouldReturnAnInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse');   
+        $this->start($this->request, null)->shouldReturnAnInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse');
     }
 
     function it_should_obey_the_post_only_option($ldap, $entryPoint, $dispatcher, $authSuccess, $authFailure, $ldapUserProvider)
@@ -342,26 +345,26 @@ class LdapGuardAuthenticatorSpec extends ObjectBehavior
         $connection->execute(new AuthenticationOperation('foo', 'bar'))->shouldBeCalled()->willReturn(new AuthenticationResponse(true));
         $this->checkCredentials($credentials, $user)->shouldReturn(true);
 
-        $dispatcher->dispatch('ldap_tools_bundle.login.success', new LdapLoginEvent($user, $token))->shouldBeCalled();
+        $dispatcher->dispatch(new LdapLoginEvent($user, $token), 'ldap_tools_bundle.login.success')->shouldBeCalled();
     }
 
     function it_should_call_an_auth_success_handler_event(Request $request, $dispatcher, TokenInterface $token)
     {
-        $dispatcher->dispatch('ldap_tools_bundle.guard.login.success', Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\AuthenticationHandlerEvent'))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\AuthenticationHandlerEvent'), 'ldap_tools_bundle.guard.login.success')->shouldBeCalled();
 
         $this->onAuthenticationSuccess($request, $token, 'foo');
     }
 
     function it_should_call_an_auth_failure_handler_event(Request $request, $dispatcher)
     {
-        $dispatcher->dispatch('ldap_tools_bundle.guard.login.failure', Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\AuthenticationHandlerEvent'))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\AuthenticationHandlerEvent'), 'ldap_tools_bundle.guard.login.failure')->shouldBeCalled();
 
         $this->onAuthenticationFailure($request, new AuthenticationException('foo'));
     }
 
     function it_should_call_an_auth_start_event(Request $request, $dispatcher)
     {
-        $dispatcher->dispatch('ldap_tools_bundle.guard.login.start', Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\AuthenticationHandlerEvent'))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type('LdapTools\Bundle\LdapToolsBundle\Event\AuthenticationHandlerEvent'), 'ldap_tools_bundle.guard.login.start')->shouldBeCalled();
 
         $this->start($request, new AuthenticationException('foo'));
     }

@@ -27,11 +27,6 @@ class LdapUserCheckerSpec extends ObjectBehavior
         $this->shouldImplement('\Symfony\Component\Security\Core\User\UserCheckerInterface');
     }
 
-    function it_should_extend_the_UserChecker()
-    {
-        $this->shouldBeAnInstanceOf('\Symfony\Component\Security\Core\User\UserChecker');
-    }
-
     function it_should_error_when_the_response_code_for_the_user_is_for_a_disabled_account(LdapUser $user)
     {
         $this->shouldThrow('\Symfony\Component\Security\Core\Exception\DisabledException')->duringCheckLdapErrorCode(

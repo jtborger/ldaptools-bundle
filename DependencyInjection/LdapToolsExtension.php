@@ -132,7 +132,7 @@ class LdapToolsExtension extends Extension
 
     protected function setGuardConfiguration(ContainerBuilder $container, array $config, array $security)
     {
-        $container->setParameter('ldap_tools.security.guard.auth_success',  [
+        $container->setParameter('ldap_tools.security.guard.auth_success', [
             'default_target_path' => $config['default_target_path'],
             'always_use_target_path' => $config['always_use_target_path'],
             'target_path_parameter' => $config['target_path_parameter'],
@@ -145,7 +145,7 @@ class LdapToolsExtension extends Extension
             'failure_path_parameter' => $config['failure_path_parameter'],
             'login_path' => $config['login_path'],
         ]);
-        $container->setParameter('ldap_tools.security.guard.options',  [
+        $container->setParameter('ldap_tools.security.guard.options', [
             'username_parameter' => $config['username_parameter'],
             'password_parameter' => $config['password_parameter'],
             'domain_parameter' => $config['domain_parameter'],

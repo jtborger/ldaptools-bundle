@@ -204,15 +204,17 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
                     $this->ldap->getConnection()->getConfig()->getLdapType()
                 );
                 throw new CustomUserMessageAuthenticationException(
-                    $response->getErrorMessage(), [], $response->getErrorCode()
+                    $response->getErrorMessage(),
+                    [],
+                    $response->getErrorCode()
                 );
             }
             // No way to get the token from the Guard, need to create one to pass...
             $token = new UsernamePasswordToken($user, $credentials['password'], 'ldap-tools', $user->getRoles());
             $token->setAttribute('ldap_domain', $credDomain);
             $this->dispatcher->dispatch(
-                LdapLoginEvent::SUCCESS,
-                new LdapLoginEvent($user, $token)
+                new LdapLoginEvent($user, $token),
+                LdapLoginEvent::SUCCESS
             );
         } catch (\Exception $e) {
             $this->hideOrThrow($e, $this->options['hide_user_not_found_exceptions']);
@@ -236,7 +238,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
             $token,
             $providerKey
         );
-        $this->dispatcher->dispatch(AuthenticationHandlerEvent::SUCCESS, $event);
+        $this->dispatcher->dispatch($event, AuthenticationHandlerEvent::SUCCESS);
 
         return $this->options['http_basic'] ? null : $event->getResponse();
     }
@@ -251,7 +253,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
             $request,
             $exception
         );
-        $this->dispatcher->dispatch(AuthenticationHandlerEvent::FAILURE, $event);
+        $this->dispatcher->dispatch($event, AuthenticationHandlerEvent::FAILURE);
 
         return $this->options['http_basic'] ? null : $event->getResponse();
     }
@@ -267,7 +269,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
             $request,
             $authException
         );
-        $this->dispatcher->dispatch(AuthenticationHandlerEvent::START, $event);
+        $this->dispatcher->dispatch($event, AuthenticationHandlerEvent::START);
 
         return $event->getResponse();
     }
@@ -299,7 +301,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
     {
         if ($this->options['http_basic']) {
             return $request->server->get('PHP_AUTH_USER');
-        } else{
+        } else {
             return $this->getRequestParameter($this->options['username_parameter'], $request);
         }
     }
@@ -312,7 +314,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
     {
         if ($this->options['http_basic']) {
             return $request->server->get('PHP_AUTH_PW');
-        } else{
+        } else {
             return $this->getRequestParameter($this->options['password_parameter'], $request);
         }
     }
@@ -325,7 +327,7 @@ class LdapGuardAuthenticator extends AbstractGuardAuthenticator
     {
         if ($this->options['http_basic']) {
             return $this->options['http_basic_domain'];
-        } else{
+        } else {
             return $this->getRequestParameter($this->options['domain_parameter'], $request);
         }
     }

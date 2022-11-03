@@ -41,7 +41,7 @@ class LdapUserSpec extends ObjectBehavior
 
     function it_should_implement_AdvancedUserInterface()
     {
-        $this->shouldImplement('\Symfony\Component\Security\Core\User\AdvancedUserInterface');
+        $this->shouldImplement('\Symfony\Component\Security\Core\User\UserInterface');
     }
 
     function it_should_implement_Serializable()

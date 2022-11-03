@@ -18,9 +18,6 @@ use LdapTools\Query\LdapQuery;
 use LdapTools\Query\LdapQueryBuilder;
 use PhpSpec\ObjectBehavior;
 
-/**
- * @require Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface
- */
 class LdapObjectChoiceLoaderSpec extends ObjectBehavior
 {
     public function let(LdapManager $ldap, LdapQueryBuilder $qb, LdapQuery $query)

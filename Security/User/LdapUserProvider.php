@@ -88,11 +88,11 @@ class LdapUserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        $this->dispatcher->dispatch(LoadUserEvent::BEFORE, new LoadUserEvent($username, $this->ldap->getDomainContext()));
+        $this->dispatcher->dispatch(new LoadUserEvent($username, $this->ldap->getDomainContext()), LoadUserEvent::BEFORE);
         $ldapUser = $this->getLdapUser('username', $username);
         $user = $this->constructUserClass($ldapUser);
         $this->roleMapper->setRoles($user);
-        $this->dispatcher->dispatch(LoadUserEvent::AFTER, new LoadUserEvent($username, $this->ldap->getDomainContext(), $user, $ldapUser));
+        $this->dispatcher->dispatch(new LoadUserEvent($username, $this->ldap->getDomainContext(), $user, $ldapUser), LoadUserEvent::AFTER);
 
         return $user;
     }
@@ -187,7 +187,7 @@ class LdapUserProvider implements UserProviderInterface
             $user->setLdapGuid($ldapObject->get('guid'));
         } catch (\Throwable $e) {
             throw new UnsupportedUserException(sprintf($errorMessage, $this->options['user'], $e->getMessage()));
-        // Unlikely to help much in PHP 5.6, but oh well...
+            // Unlikely to help much in PHP 5.6, but oh well...
         } catch (\Exception $e) {
             throw new UnsupportedUserException(sprintf($errorMessage, $this->options['user'], $e->getMessage()));
         }

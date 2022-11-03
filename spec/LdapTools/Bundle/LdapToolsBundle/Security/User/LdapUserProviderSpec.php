@@ -26,6 +26,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\User\User;
+use Prophecy\Promise\ReturnArgumentPromise;
 
 class LdapUserProviderSpec extends ObjectBehavior
 {
@@ -62,6 +63,11 @@ class LdapUserProviderSpec extends ObjectBehavior
         $connection->getConfig()->willReturn($config);
         $ldap->getConnection()->willReturn($connection);
 
+        $dispatcher->dispatch(
+            Argument::type(\Symfony\Contracts\EventDispatcher\Event::class),
+            Argument::type('string')
+        )->willReturn(new ReturnArgumentPromise(0));
+
         $this->beConstructedWith($ldap, $dispatcher, $roleMapper, []);
     }
 
@@ -72,8 +78,8 @@ class LdapUserProviderSpec extends ObjectBehavior
 
     function it_should_load_by_username($dispatcher)
     {
-        $dispatcher->dispatch(LoadUserEvent::BEFORE, Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'))->shouldBeCalledTimes(1);
-        $dispatcher->dispatch(LoadUserEvent::AFTER, Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'))->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'), LoadUserEvent::BEFORE)->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(Argument::type('\LdapTools\Bundle\LdapToolsBundle\Event\LoadUserEvent'), LoadUserEvent::AFTER)->shouldBeCalledTimes(1);
 
         $this->loadUserByUsername('foo')->shouldBeAnInstanceOf('\LdapTools\Bundle\LdapToolsBundle\Security\User\LdapUser');
     }
