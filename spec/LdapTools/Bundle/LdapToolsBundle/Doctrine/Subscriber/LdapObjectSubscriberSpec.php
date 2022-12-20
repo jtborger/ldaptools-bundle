@@ -11,9 +11,9 @@
 namespace spec\LdapTools\Bundle\LdapToolsBundle\Doctrine\Subscriber;
 
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use LdapTools\Bundle\LdapToolsBundle\Annotation\LdapObject;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
@@ -35,15 +35,8 @@ class LdapObjectSubscriberSpec extends ObjectBehavior
 
     function let(Reader $reader, LdapManager $ldap, LifecycleEventArgs $eventArgs, ObjectManager $om, ClassMetadata $metadata, LdapObjectSchemaFactory $schemaFactory, LdapConnectionInterface $connection, LdapObjectSchema $schema, LdapQueryBuilder $qb, LdapQuery $query, $entity)
     {
-        $rc = new \ReflectionClass('Doctrine\Common\Persistence\Event\LifecycleEventArgs');
-
-        if ($rc->hasMethod('getObjectManager')) {
-            $eventArgs->getObjectManager()->willReturn($om);
-            $eventArgs->getObject()->willReturn($entity);
-        } else {
-            $eventArgs->getEntityManager()->willReturn($om);
-            $eventArgs->getEntity()->willReturn($entity);
-        }
+        $eventArgs->getObjectManager()->willReturn($om);
+        $eventArgs->getObject()->willReturn($entity);
 
         $om->getClassMetadata(Argument::any())->willReturn($metadata);
 
