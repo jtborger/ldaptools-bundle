@@ -12,9 +12,9 @@ namespace LdapTools\Bundle\LdapToolsBundle\Doctrine\Subscriber;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\Common\Persistence\ObjectManager;
 use LdapTools\Bundle\LdapToolsBundle\Annotation\LdapObject as LdapObjectAnnotation;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Doctrine\Persistence\ObjectManager;
 use LdapTools\LdapManager;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCollection;
@@ -84,8 +84,8 @@ class LdapObjectSubscriber implements EventSubscriber
      */
     public function postLoad(LifecycleEventArgs $args)
     {
-        $entity = $this->getObjectFromLifeCycleArgs($args);
-        $om = $this->getOmFromLifeCycleArgs($args);
+        $entity = $args->getObject();
+        $om = $args->getObjectManager();
 
         $properties = $this->getLdapObjectAnnotationProperties($entity, $om);
         foreach ($properties as $info) {
@@ -102,8 +102,8 @@ class LdapObjectSubscriber implements EventSubscriber
      */
     protected function transformValueForDb(LifecycleEventArgs $args)
     {
-        $entity = $this->getObjectFromLifeCycleArgs($args);
-        $om = $this->getOmFromLifeCycleArgs($args);
+        $entity = $args->getObject();
+        $om = $args->getObjectManager();
 
         $properties = $this->getLdapObjectAnnotationProperties($entity, $om);
         foreach ($properties as $info) {
@@ -245,39 +245,5 @@ class LdapObjectSubscriber implements EventSubscriber
         }
 
         return $results;
-    }
-
-    /**
-     * Avoid calling deprecated methods if possible.
-     *
-     * @param LifecycleEventArgs $args
-     * @return object
-     */
-    protected function getObjectFromLifeCycleArgs(LifecycleEventArgs $args)
-    {
-        $rc = new \ReflectionClass('Doctrine\ORM\Event\LifecycleEventArgs');
-
-        if ($rc->hasMethod('getObject')) {
-            return $args->getObject();
-        } else {
-            return $args->getEntity();
-        }
-    }
-
-    /**
-     * Avoid calling deprecated methods if possible.
-     *
-     * @param LifecycleEventArgs $args
-     * @return \Doctrine\Common\Persistence\ObjectManager|\Doctrine\ORM\EntityManager
-     */
-    protected function getOmFromLifeCycleArgs(LifecycleEventArgs $args)
-    {
-        $rc = new \ReflectionClass('Doctrine\ORM\Event\LifecycleEventArgs');
-
-        if ($rc->hasMethod('getObjectManager')) {
-            return $args->getObjectManager();
-        } else {
-            return $args->getEntityManager();
-        }
     }
 }
